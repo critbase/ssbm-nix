@@ -1,6 +1,6 @@
 { stdenv, makeDesktopItem, gcc, slippi-desktop, playbackSlippi, fetchFromGitHub, makeWrapper
 , mesa_drivers, mesa_glu, mesa, pkgconfig, cmake, bluez, ffmpeg, libao, libGLU
-, gtk2, gtk3, gsettings-desktop-schemas, glib, glib-networking, gettext, xorg, readline, openal, libevdev, portaudio, libusb
+, gtk2, gtk3, wrapGApps, glib, glib-networking, gettext, xorg, readline, openal, libevdev, portaudio, libusb
 , libpulseaudio, libudev, gnumake, wxGTK30, gdk-pixbuf, soundtouch, miniupnpc
 , mbedtls, curl, lzo, sfml, enet, xdg_utils, hidapi, webkit, vulkan-loader }:
 let
@@ -69,7 +69,6 @@ in stdenv.mkDerivation rec {
     wrapProgram "$out/dolphin-emu" \
       --set "GDK_BACKEND" "x11" \
       --prefix GIO_EXTRA_MODULES : "${glib-networking}/lib/gio/modules" \
-      --prefix XDG_DATA_DIRS : "${gsettings-desktop-schemas}/share/gsettings-schemas/${gsettings-desktop-schemas.name}:${gtk3}/share/gsettings-schemas/${gtk3.name}:$XDG_DATA_DIRS" \
       --prefix LD_LIBRARY_PATH : "${vulkan-loader}/lib" \
       --add-flags '-u $HOME/.config/slippi-playback'
     ln -s $out/dolphin-emu $out/bin/slippi-playback
@@ -78,14 +77,13 @@ in stdenv.mkDerivation rec {
     wrapProgram "$out/dolphin-emu" \
       --set "GDK_BACKEND" "x11" \
       --prefix GIO_EXTRA_MODULES : "${glib-networking}/lib/gio/modules" \
-      --prefix XDG_DATA_DIRS : "${gsettings-desktop-schemas}/share/gsettings-schemas/${gsettings-desktop-schemas.name}:${gtk3}/share/gsettings-schemas/${gtk3.name}:$XDG_DATA_DIRS" \
       --prefix LD_LIBRARY_PATH : "${vulkan-loader}/lib" \
       --add-flags '-u $HOME/.config/slippi-netplay'
     ln -s $out/dolphin-emu $out/bin/slippi-netplay
     ln -s ${netplay-desktop}/share/applications $out/share
   '';
 
-  nativeBuildInputs = [ pkgconfig cmake ];
+  nativeBuildInputs = [ pkgconfig cmake wrapGApps ];
   buildInputs = [
     vulkan-loader
     makeWrapper
